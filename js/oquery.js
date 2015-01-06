@@ -1,7 +1,79 @@
 ;(function (window, document, undefined) {
-    var $o = function (selector) {
-		return new $o.fn.init(selector);
-	};
+    var
+    
+    $o = function (selector) {
+        $o.fn.init.prototype = $o.fn;
+        return new $o.fn.init(selector);
+	},
+    lst = function() {
+        var events = {};
+
+        if (typeof window.addEventListener === 'function') {
+            events.addListener = function(el, type, fn) {
+                el.addEventListener(type, fn, false);
+            };
+            events.removeListener = function(el, type, fn) {
+                el.removeEventListener(type, fn, false);
+            };
+        } else if (typeof document.attachEvent === 'function') { // IE
+            events.addListener = function(el, type, fn) {
+                el.attachEvent('on' + type, fn);
+            };
+            events.removeListener = function(el, type, fn) {
+                el.detachEvent('on' + type, fn);
+            };
+        } else { // Older
+            events.addListener = function(el, type, fn) {
+                el['on' + type] = fn;
+            };
+            events.removeListener = function(el, type, fn) {
+                el['on' + type] = null;
+            };
+        };
+
+        return events;
+    }(),
+    isElementSelector = function (selector) {
+        return !/[^a-z]/i.test(selector);
+    },
+    isHasAttrSelector = function (selector) {
+        return /\[((?!=).)+\]/g.exec(selector);
+    },
+    isEqualAttrSelector = function (selector) {
+        return /\[(.+)=(.+)\]/g.exec(selector);
+    },
+    getElementsByAttribute = function (attr) {
+        var all = document.getElementsByTagName('*'),
+            match = [];
+        
+        for (var i = 0, len = all.length; i < len; i++) {
+            var el = all[i];
+            if (el.hasAttribute(attr))
+                match.push(el);
+        }
+        
+        return match;
+    },
+    getElementsByAttributeValue = function (attr, value) {
+        var all = document.getElementsByTagName('*'),
+            match = [];
+        
+        for (var i = 0, len = all.length; i < len; i++) {
+            var el = all[i];
+            if (el.hasAttribute(attr) && el.getAttribute(attr) === value)
+                match.push(el);
+        }
+        
+        return match;
+    },
+    insertAfter = function (el, content) {
+        if (typeof content === 'string') {
+            el.insertAdjacentHTML('afterEnd', content);   
+        }
+        else if ((content.nodeType && content.nodeType === 3) || content instanceof $o.fn.init) {
+            el.insertAdjacentHTML('afterEnd', content.textContent);   
+        }
+    };
     
     // Polyfills
     if (!document.getElementsByClassName) {
@@ -26,55 +98,9 @@
         };
     }
     
-    // Private functions
-    var isElementSelector = function (selector) {
-        return !/[^a-z]/i.test(selector);
-    };
-    
-    var isHasAttrSelector = function (selector) {
-        return /\[((?!=).)+\]/g.exec(selector);
-    };
-    
-    var isEqualAttrSelector = function (selector) {
-        return /\[(.+)=(.+)\]/g.exec(selector);
-    };
-    
-    var getElementsByAttribute = function (attr) {
-        var all = document.getElementsByTagName('*'),
-            match = [];
-        
-        for (var i = 0, len = all.length; i < len; i++) {
-            var el = all[i];
-            if (el.hasAttribute(attr))
-                match.push(el);
-        }
-        
-        return match;
-    };
-    
-    var getElementsByAttributeValue = function (attr, value) {
-        var all = document.getElementsByTagName('*'),
-            match = [];
-        
-        for (var i = 0, len = all.length; i < len; i++) {
-            var el = all[i];
-            if (el.hasAttribute(attr) && el.getAttribute(attr) === value)
-                match.push(el);
-        }
-        
-        return match;
-    };
-    
-    var insertAfter = function (el, content) {
-        if (typeof content === 'string') {
-            el.insertAdjacentHTML('afterEnd', content);   
-        }
-        else if ((content.nodeType && content.nodeType === 3) || content instanceof $o.fn.init) {
-            el.insertAdjacentHTML('afterEnd', content.textContent);   
-        }
-    };
-    
     $o.fn = $o.prototype = {
+        constructor: $o,
+        
         init: function (selector) {
             if (!selector) return this;
             
@@ -93,6 +119,7 @@
                 else if (selector.charAt(0) === '#') {
                     this.target = document.getElementById(selector.slice(1, selector.length));   
                 }
+                // Element selector (e.g. div)
                 else if (isElementSelector(selector)) {
                     this.target = document.getElementsByTagName(selector);
                 }
@@ -109,11 +136,14 @@
                 else if (selector === '*') {
                     this.target = document.getElementsByTagName(selector);
                 }
-                else return this;
             }
             
             this.length = this.target.length || 0;
         },
+        
+        addListener: lst.addListener,
+        
+        removeListener: lst.removeListener,
         
         addClass: function (className) {
             if (this.length === 0) {
@@ -147,15 +177,67 @@
             // Get attr value
             if (value === undefined) {
                 var el = (this.length === 0 ? this.target : this.target[0]);
-                
                 return el.getAttribute(attr);
             }
-            // Set attr
+            // Set attr with string
             else {
-                   
+                if (this.length === 0) {
+                    this.target.setAttribute(attr, value);
+                }
+                else {
+                    for (var i = 0, len = this.length; i < len; i++)
+                        this.target[i].setAttribute(attr, value);
+                }
+                
+                return this;
             }
-        }
-        // Remove class
+        },
+        
+        bind: function (eventType, handler) {
+            this.addListener(this.target, eventType, handler);
+            return this;
+        },
+        
+        css: function (prop, value) {
+            if (!prop) return;
+            
+            if (value === undefined) {
+                return window.getComputedStyle(this.length ? this.target[0] : this.target, null).getPropertyValue(prop);
+            }
+            else {
+                if (this.length) {
+                    for (var i = 0, len = this.length; i < len; i++) {
+                        this.target[i][prop] = value;
+                    }
+                } else {
+                    this.target[prop] = value;
+                }
+                
+                return this;
+            }
+        },
+        
+        eq: function (idx) {
+            var el = this.target[idx];
+            return el ? new $o.fn.init(selector) : this;
+        },
+        
+        first: function () {
+            return this.eq(0);   
+        },
+        
+        last: function () {
+            return this.eq(this.length - 1);
+        },
+        
+        removeClass: function () {
+            
+        },
+        
+        unbind: function (eventType, handler) {
+            this.removeListener(this.target, eventType, handler);
+            return this;
+        },
     };
     
     window.$o = $o;
