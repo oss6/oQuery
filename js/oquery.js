@@ -65,8 +65,13 @@
         return match;
     };
     
-    var formatClass = function (className) {
-        ret  
+    var insertAfter = function (el, content) {
+        if (typeof content === 'string') {
+            el.insertAdjacentHTML('afterEnd', content);   
+        }
+        else if ((content.nodeType && content.nodeType === 3) || content instanceof $o.fn.init) {
+            el.insertAdjacentHTML('afterEnd', content.textContent);   
+        }
     };
     
     $o.fn = $o.prototype = {
@@ -122,7 +127,20 @@
             }
             
             return this;
-        }
+        },
+        
+        after: function (content) {
+            if (this.length === 0) {
+                insertAfter(this.target, content);
+            }
+            else {
+                for (var i = 0, len = this.length; i < len; i++) {
+                    insertAfter(this.target[i], content);   
+                }
+            }
+            
+            return this;
+        },
         
         // Remove class
     };
