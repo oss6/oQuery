@@ -31,6 +31,14 @@
         
     };
     
+    var is_has_attr_selector = function (selector) {
+          
+    };
+    
+    var is_equal_attr_selector = function (selector) {
+          
+    };
+    
     $o.fn = $o.prototype = {
         init: function (selector) {
             if (!selector) return this;
@@ -52,6 +60,12 @@
                 }
                 else if (is_element_selector(selector)) {
                     this.target = document.getElementsByTagName(selector);
+                }
+                else if (is_has_attr_selector(selector)) {
+                    
+                }
+                else if (is_equal_attr_selector(selector)) {
+                    
                 }
                 // All
                 else if (selector = '*') {
