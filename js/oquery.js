@@ -142,6 +142,19 @@
             return this;
         },
         
+        attr: function (attr, value) {
+            
+            // Get attr value
+            if (value === undefined) {
+                var el = (this.length === 0 ? this.target : this.target[0]);
+                
+                return el.getAttribute(attr);
+            }
+            // Set attr
+            else {
+                   
+            }
+        }
         // Remove class
     };
     
