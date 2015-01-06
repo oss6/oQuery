@@ -5,6 +5,7 @@
         $o.fn.init.prototype = $o.fn;
         return new $o.fn.init(selector);
 	},
+        
     lst = function() {
         var events = {};
 
@@ -33,15 +34,19 @@
 
         return events;
     }(),
+        
     isElementSelector = function (selector) {
         return !/[^a-z]/i.test(selector);
     },
+        
     isHasAttrSelector = function (selector) {
         return /\[((?!=).)+\]/g.exec(selector);
     },
+        
     isEqualAttrSelector = function (selector) {
         return /\[(.+)=(.+)\]/g.exec(selector);
     },
+        
     getElementsByAttribute = function (attr) {
         var all = document.getElementsByTagName('*'),
             match = [];
@@ -54,6 +59,7 @@
         
         return match;
     },
+        
     getElementsByAttributeValue = function (attr, value) {
         var all = document.getElementsByTagName('*'),
             match = [];
@@ -66,6 +72,7 @@
         
         return match;
     },
+        
     insertAfter = function (el, content) {
         if (typeof content === 'string') {
             el.insertAdjacentHTML('afterEnd', content);   
@@ -73,6 +80,20 @@
         else if ((content.nodeType && content.nodeType === 3) || content instanceof $o.fn.init) {
             el.insertAdjacentHTML('afterEnd', content.textContent);   
         }
+    },
+    
+    formatStr = function (str) {
+        return str.replace(/\s{2,}/g, ' ');
+    },
+    
+    remClass = function (el, classes) {
+        var cls = classes.split(' ');
+        
+        for (var i = 0, len = cls.length; i < len; i++) {
+            el.className = el.className.replace(classes[i], '');   
+        }
+        
+        el.className = formatStr(el.className);
     };
     
     // Polyfills
@@ -230,8 +251,16 @@
             return this.eq(this.length - 1);
         },
         
-        removeClass: function () {
+        removeClass: function (className) {
+            if (this.length === 0) {
+                remClass(this.target, className);
+            }
+            else {
+                for (var i = 0, len = this.length; i < len; i++)
+                    remClass(this.target[i], className);
+            }
             
+            return this;
         },
         
         unbind: function (eventType, handler) {
