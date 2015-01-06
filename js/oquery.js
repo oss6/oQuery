@@ -28,19 +28,32 @@
     
     // Private functions
     var isElementSelector = function (selector) {
-        
+        return !/[^a-z]/i.test(selector);
     };
     
     var isHasAttrSelector = function (selector) {
-          
+        return /\[((?!=).)+\]/g.exec(selector);
     };
     
     var isEqualAttrSelector = function (selector) {
-          
+        return /\[(.+)=(.+)\]/g.exec(selector);
     };
     
-    var getElementsByAttribute = function (selector) {
-          
+    var getElementsByAttribute = function (attr) {
+        var all = document.getElementsByTagName('*'),
+            match = [];
+        
+        for (var i = 0, len = all.length; i < len; i++) {
+            var el = all[i];
+            if (el.hasAttribute(attr))
+                match.push(el);
+        }
+        
+        return match;
+    };
+    
+    var getElementsByAttributeValue = function (attr, value) {
+        
     };
     
     $o.fn = $o.prototype = {
@@ -65,16 +78,20 @@
                 else if (isElementSelector(selector)) {
                     this.target = document.getElementsByTagName(selector);
                 }
-                else if (isHasAttrSelector(selector)) {
+                else if ((match = isHasAttrSelector(selector)) !== null) {
+                    // Get attribute name
+                    var attrName = match[0].slice(1, selector.length - 1);
                     
+                    this.target = getElementsByAttribute(attrName);
                 }
-                else if (isEqualAttrSelector(selector)) {
-                    
+                else if ((match = isEqualAttrSelector(selector)) !== null) {
+                    this.target = getElementsByAttributeValue(match[1], match[2]);
                 }
                 // All
-                else if (selector = '*') {
+                else if (selector === '*') {
                     this.target = document.getElementsByTagName(selector);
                 }
+                else return this;
             }
             
             this.length = this.target.length || 0;
