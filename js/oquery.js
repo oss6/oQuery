@@ -27,15 +27,19 @@
     }
     
     // Private functions
-    var is_element_selector = function (selector) {
+    var isElementSelector = function (selector) {
         
     };
     
-    var is_has_attr_selector = function (selector) {
+    var isHasAttrSelector = function (selector) {
           
     };
     
-    var is_equal_attr_selector = function (selector) {
+    var isEqualAttrSelector = function (selector) {
+          
+    };
+    
+    var getElementsByAttribute = function (selector) {
           
     };
     
@@ -58,13 +62,13 @@
                 else if (selector.charAt(0) === '#') {
                     this.target = document.getElementById(selector.slice(1, selector.length));   
                 }
-                else if (is_element_selector(selector)) {
+                else if (isElementSelector(selector)) {
                     this.target = document.getElementsByTagName(selector);
                 }
-                else if (is_has_attr_selector(selector)) {
+                else if (isHasAttrSelector(selector)) {
                     
                 }
-                else if (is_equal_attr_selector(selector)) {
+                else if (isEqualAttrSelector(selector)) {
                     
                 }
                 // All
