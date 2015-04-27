@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>oQuery | JS library for educational purposes</title>
-    </head>
-    <body>
-        <div id="one"></div>
-        <div class="active"></div>
-        <div></div>
-        
-        <script type="text/javascript" src="js/oquery.js"></script>
-    </body>
+<head>
+    <meta charset="utf-8">
+    <title>oQuery | JS library for educational purposes</title>
+
+    <link rel="stylesheet" href="css/tiny-assert.css">
+</head>
+<body>
+    <div class="tiny-assert"></div>
+
+    <script src="js/oquery.js"></script>
+    <script src="js/tiny-assert.js"></script>
+    <script>
+        window.onload = function () {
+            $t.assert(true, 'Running');
+            $t.assert(false, 'Fail');
+        };
+    </script>
+</body>
 </html>
