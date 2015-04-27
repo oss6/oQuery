@@ -1,4 +1,5 @@
 ;(function (window, document, undefined) {
+
     var
     
     $o = function (selector) {
@@ -30,7 +31,7 @@
             events.removeListener = function(el, type, fn) {
                 el['on' + type] = null;
             };
-        };
+        }
 
         return events;
     }(),
@@ -124,7 +125,9 @@
         
         init: function (selector) {
             if (!selector) return this;
-            
+
+            var match;
+
             // DOMElement
             if (selector.nodeType) {
                 this.target = selector;
@@ -266,7 +269,7 @@
         unbind: function (eventType, handler) {
             this.removeListener(this.target, eventType, handler);
             return this;
-        },
+        }
     };
     
     window.$o = $o;
