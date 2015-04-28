@@ -1,24 +1,29 @@
 var $t = (function () {
 
     var _ = {};
+    var suiteDiv,
+        list,
+        host = document.getElementsByClassName('tiny-assert')[0];
 
     _.suite = function (name, fn) {
-        var host = document.getElementsByClassName('tiny-assert')[0],
-            suite = document.createElement('div'),
-            title = document.createElement('h1');
-
-        suite.className = 'suite';
+        suiteDiv = document.createElement('div');
+        suiteDiv.className = 'suite';
+        list = document.createElement('ul');
+        var title = document.createElement('h1');
 
         title.appendChild(document.createTextNode(name));
-        suite.appendChild(title);
-        host.appendChild(suite);
+        suiteDiv.appendChild(title);
+        suiteDiv.appendChild(list);
+        host.appendChild(suiteDiv);
+
+        fn();
     };
 
     _.assert = function (expr, desc) {
         var li = document.createElement('li');
         li.className = expr ? 'pass' : 'fail';
         li.appendChild(document.createTextNode(desc));
-        document.getElementsByClassName('tiny-assert')[0].appendChild(li);
+        list.appendChild(li);
     };
 
     return _;

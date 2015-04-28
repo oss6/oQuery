@@ -73,29 +73,81 @@
         
         return match;
     },
-        
-    insertAfter = function (el, content) {
+
+    append = function (el, content) {
         if (typeof content === 'string') {
-            el.insertAdjacentHTML('afterEnd', content);   
+            el.insertAdjacentHTML('beforeend', content);
         }
-        else if ((content.nodeType && content.nodeType === 3) || content instanceof $o.fn.init) {
-            el.insertAdjacentHTML('afterEnd', content.textContent);   
+        else if (content.nodeType && content.nodeType === 3) {
+            el.insertAdjacentHTML('afterEnd', content.textContent);
+        }
+        else if (content instanceof $o.fn.init) {
+            el.appendChild(content.target);
         }
     },
-    
+
+    insertAfter = function (el, content) {
+        if (typeof content === 'string') {
+            el.insertAdjacentHTML('afterend', content);
+        }
+        else if (content.nodeType && content.nodeType === 3) {
+            el.insertAdjacentHTML('afterend', content.textContent);
+        }
+        else if (content instanceof $o.fn.init) {
+            var target = content.target,
+                clone = target.cloneNode(true);
+
+            el.parentNode.insertBefore(clone, el.nextSibling);
+        }
+    },
+
+    removeChildNodes = function (el) {
+        while (el.firstChild) {
+            el.removeChild(el.firstChild);
+        }
+    },
+
+    forEach = function (arr, fn) {
+        for (var i = 0, l = arr.length; i < l; i++) {
+            fn(arr[i], i);
+        }
+    },
+
     formatStr = function (str) {
         return str.replace(/\s{2,}/g, ' ');
     },
-    
-    remClass = function (el, classes) {
-        var cls = classes.split(' ');
-        
-        for (var i = 0, len = cls.length; i < len; i++) {
-            el.className = el.className.replace(classes[i], '');   
-        }
-        
-        el.className = formatStr(el.className);
-    };
+
+    classy = (function () {
+
+        var exp = {};
+
+        var trim = function (str) {
+            return str.replace(/^\s+|\s+$/g, '');
+        };
+
+        exp.add = function (el, name) {
+            if (exp.has(el, name)) return;
+
+            if (el.className === '') {
+                el.className = name;
+            }
+            else {
+                el.className += ' ' + name;
+            }
+        };
+
+        exp.remove = function (el, name) {
+            var className = el.className;
+            el.className = trim(className.replace(name, '').replace(/\s{2,}/g, ' '));
+        };
+
+        exp.has = function (el, name) {
+            return el.className && new RegExp("(^|\\s)" + name + "(\\s|$)").test(el.className);
+        };
+
+        return exp;
+
+    })();
     
     // Polyfills
     if (!document.getElementsByClassName) {
@@ -171,13 +223,12 @@
         
         addClass: function (className) {
             if (this.length === 0) {
-                this.target.className += (this.target.className === '' ? className : ' ' + className);
+                classy.add(this.target, className);
             }
             else {
-                for (var i = 0, len = this.length; i < len; i++) {
-                    var el = this.target[i];
-                    el.className += (el.className === '' ? className : ' ' + className);
-                }
+                forEach(this.target, function (e) {
+                    classy.add(e, className);
+                });
             }
             
             return this;
@@ -188,11 +239,24 @@
                 insertAfter(this.target, content);
             }
             else {
-                for (var i = 0, len = this.length; i < len; i++) {
-                    insertAfter(this.target[i], content);   
-                }
+                forEach(this.target, function (e) {
+                    insertAfter(e, content);
+                });
             }
             
+            return this;
+        },
+
+        append: function (content) {
+            if (this.length === 0) {
+                append(this.target, content);
+            }
+            else {
+                forEach(this.target, function (e) {
+                    append(e, content);
+                });
+            }
+
             return this;
         },
         
@@ -245,25 +309,85 @@
             var el = this.target[idx];
             return el ? new $o.fn.init(selector) : this;
         },
+
+        empty: function () {
+            // Remove all child nodes
+            if (this.length === 0) {
+                removeChildNodes(this.target);
+            }
+            else {
+                forEach(this.target, function (e) {
+                    removeChildNodes(e);
+                });
+            }
+
+            return this;
+        },
         
         first: function () {
             return this.eq(0);   
         },
-        
+
+        hasClass: function (className) {
+            if (this.length === 0) {
+                return classy.has(this.target, className);
+            }
+
+            for (var i = 0, len = this.length; i < len; i++) {
+                if (classy.has(this.target[i], className))
+                    return true;
+            }
+
+            return false;
+        },
+
+        hide: function () {
+            if (this.length === 0) {
+                if (this.target.style.display !== 'none') {
+                    this.target.style.display = 'none';
+                }
+            }
+            else {
+                forEach(this.target, function (e) {
+                    if (e.style.display !== 'none') {
+                        e.style.display = 'none';
+                    }
+                });
+            }
+        },
+
         last: function () {
             return this.eq(this.length - 1);
         },
-        
-        removeClass: function (className) {
+
+        remove: function () {
+            // Remove without filtering
             if (this.length === 0) {
-                remClass(this.target, className);
+                this.target.parentNode.removeChild(this.target);
             }
             else {
-                for (var i = 0, len = this.length; i < len; i++)
-                    remClass(this.target[i], className);
+                forEach(this.target, function (e) {
+                    e.parentNode.removeChild(e);
+                });
+            }
+        },
+
+        removeClass: function (className) {
+            if (this.length === 0) {
+                classy.remove(this.target, className);
+            }
+            else {
+                forEach(this.target, function (e) {
+                    classy.remove(e, className);
+                });
             }
             
             return this;
+        },
+
+        show: function () {
+            // Back to previous (olddisplay) display property
+
         },
         
         unbind: function (eventType, handler) {

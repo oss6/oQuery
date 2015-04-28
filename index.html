@@ -13,8 +13,59 @@
     <script src="js/tiny-assert.js"></script>
     <script>
         window.onload = function () {
-            $t.assert(true, 'Running');
-            $t.assert(false, 'Fail');
+            $t.suite('addClass', function () {
+                var dummy = document.createElement('div');
+
+                $o(dummy).addClass('active');
+                $t.assert(dummy.className === 'active', 'Single class name');
+
+                $o(dummy).addClass('card');
+                $t.assert(dummy.className === 'active card', 'Multiple class names');
+            });
+
+            $t.suite('after', function () {
+                var dummy = document.createElement('div');
+
+                $o(dummy).after('Great');
+                $t.assert(true, 'Running');
+                $t.assert(false, 'Fail');
+            });
+
+            $t.suite('attr', function () {
+
+            });
+
+            $t.suite('bind', function () {
+
+            });
+
+            $t.suite('css', function () {
+
+            });
+
+            $t.suite('eq', function () {
+
+            });
+
+            $t.suite('first', function () {
+
+            });
+
+            $t.suite('hasClass', function () {
+
+            });
+
+            $t.suite('last', function () {
+
+            });
+
+            $t.suite('removeClass', function () {
+
+            });
+
+            $t.suite('unbind', function () {
+
+            });
         };
     </script>
 </body>

@@ -1,7 +1,52 @@
-.suite {
+@import url(http://fonts.googleapis.com/css?family=Roboto);
 
+.tiny-assert {
+    font-family: 'Roboto', sans-serif;
+}
+
+.tiny-assert * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.suite {
+    padding: 20px 35px;
+    vertical-align: top;
+    background-color: #fff;
+    color: #474747;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.24);
+    line-height: 1.5;
 }
 
 .suite h1 {
+    margin-bottom: 18px;
+}
 
+.suite ul {
+    margin-left: 32px;
+}
+
+.suite ul {
+    list-style: none;
+}
+
+.suite ul li.pass {
+    color: #128923;
+}
+
+.suite ul li.pass:before {
+    content: '✔';
+    margin-left: -1em;
+    margin-right: .100em;
+}
+
+.suite ul li.fail {
+    color: #891212;
+}
+
+.suite ul li.fail:before {
+    content: '✖';
+    margin-left: -1em;
+    margin-right: .100em;
 }
