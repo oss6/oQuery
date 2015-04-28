@@ -9,7 +9,7 @@ var $t = (function () {
         suiteDiv = document.createElement('div');
         suiteDiv.className = 'suite';
         list = document.createElement('ul');
-        var title = document.createElement('h1');
+        var title = document.createElement('h2');
 
         title.appendChild(document.createTextNode(name));
         suiteDiv.appendChild(title);

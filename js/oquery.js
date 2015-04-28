@@ -79,7 +79,7 @@
             el.insertAdjacentHTML('beforeend', content);
         }
         else if (content.nodeType && content.nodeType === 3) {
-            el.insertAdjacentHTML('afterEnd', content.textContent);
+            el.insertAdjacentHTML('beforeend', content.textContent);
         }
         else if (content instanceof $o.fn.init) {
             el.appendChild(content.target);
@@ -87,17 +87,19 @@
     },
 
     insertAfter = function (el, content) {
-        if (typeof content === 'string') {
-            el.insertAdjacentHTML('afterend', content);
-        }
-        else if (content.nodeType && content.nodeType === 3) {
-            el.insertAdjacentHTML('afterend', content.textContent);
-        }
-        else if (content instanceof $o.fn.init) {
-            var target = content.target,
-                clone = target.cloneNode(true);
+        if (el.parentNode) {
+            if (typeof content === 'string') {
+                el.insertAdjacentHTML('afterend', content);
+            }
+            else if (content.nodeType && content.nodeType === 3) {
+                el.insertAdjacentHTML('afterend', content.textContent);
+            }
+            else if (content instanceof $o.fn.init) {
+                var target = content.target,
+                    clone = target.cloneNode(true);
 
-            el.parentNode.insertBefore(clone, el.nextSibling);
+                el.parentNode.insertBefore(clone, el.nextSibling);
+            }
         }
     },
 
@@ -353,6 +355,19 @@
                         e.style.display = 'none';
                     }
                 });
+            }
+        },
+
+        html: function (htmlStr) {
+            var elem = this.length === 0 ? this.target : this.target[0];
+
+            // Getter
+            if (typeof htmlStr === 'undefined') {
+                return elem.innerHTML;
+            }
+            // Setter
+            else {
+                elem.innerHTML = htmlStr;
             }
         },
 

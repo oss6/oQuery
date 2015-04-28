@@ -5,8 +5,23 @@
     <title>oQuery | JS library for educational purposes</title>
 
     <link rel="stylesheet" href="css/tiny-assert.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #454545;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        small {
+            font-size: 0.6em;
+        }
+    </style>
 </head>
 <body>
+    <h1>oQuery <small>DOM manipulation library for educational purposes</small></h1>
     <div class="tiny-assert"></div>
 
     <script src="js/oquery.js"></script>
@@ -24,11 +39,12 @@
             });
 
             $t.suite('after', function () {
-                var dummy = document.createElement('div');
+                var dummy = document.createElement('div'), innerDummy = document.createElement('div');
+                dummy.appendChild(innerDummy);
 
-                $o(dummy).after('Great');
-                $t.assert(true, 'Running');
-                $t.assert(false, 'Fail');
+                $o(innerDummy).after('<p>Hello!</p>');
+                $t.assert(dummy.lastChild.tagName === 'P' && dummy.lastChild.textContent === 'Hello!',
+                        'Append to parent');
             });
 
             $t.suite('attr', function () {
