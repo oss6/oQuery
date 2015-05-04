@@ -35,6 +35,22 @@
 
         return events;
     }(),
+
+    decorator = function (fn) {
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            var target = args[0];
+
+            if (!target.length) {
+                fn.apply(null, args);
+            }
+            else {
+                forEach(target, function (e) {
+                    fn.apply(null, [e].concat(args.slice(1)));
+                });
+            }
+        };
+    },
         
     isElementSelector = function (selector) {
         return !/[^a-z]/i.test(selector);
@@ -128,6 +144,8 @@
         };
 
         exp.add = function (el, name) {
+            console.log(el);
+
             if (exp.has(el, name)) return;
 
             if (el.className === '') {
@@ -224,40 +242,22 @@
         removeListener: lst.removeListener,
         
         addClass: function (className) {
-            if (this.length === 0) {
-                classy.add(this.target, className);
-            }
-            else {
-                forEach(this.target, function (e) {
-                    classy.add(e, className);
-                });
-            }
+            var _addClass = decorator(classy.add);
+            _addClass(this.target, className);
             
             return this;
         },
         
         after: function (content) {
-            if (this.length === 0) {
-                insertAfter(this.target, content);
-            }
-            else {
-                forEach(this.target, function (e) {
-                    insertAfter(e, content);
-                });
-            }
+            var _after = decorator(insertAfter);
+            _after(this.target, content);
             
             return this;
         },
 
         append: function (content) {
-            if (this.length === 0) {
-                append(this.target, content);
-            }
-            else {
-                forEach(this.target, function (e) {
-                    append(e, content);
-                });
-            }
+            var _append = decorator(append);
+            _append(this.target, content);
 
             return this;
         },
@@ -271,14 +271,9 @@
             }
             // Set attr with string
             else {
-                if (this.length === 0) {
-                    this.target.setAttribute(attr, value);
-                }
-                else {
-                    for (var i = 0, len = this.length; i < len; i++)
-                        this.target[i].setAttribute(attr, value);
-                }
-                
+                var _setAttr = decorator(function (el, name, value) { el.setAttribute(name, value); });
+                _setAttr(this.target, attr, value);
+
                 return this;
             }
         },
@@ -314,14 +309,8 @@
 
         empty: function () {
             // Remove all child nodes
-            if (this.length === 0) {
-                removeChildNodes(this.target);
-            }
-            else {
-                forEach(this.target, function (e) {
-                    removeChildNodes(e);
-                });
-            }
+            var _empty = decorator(removeChildNodes);
+            _empty(this.target);
 
             return this;
         },
@@ -344,18 +333,12 @@
         },
 
         hide: function () {
-            if (this.length === 0) {
-                if (this.target.style.display !== 'none') {
-                    this.target.style.display = 'none';
+            var _hide = decorator(function (e) {
+                if (e.style.display !== 'none') {
+                    e.style.display = 'none';
                 }
-            }
-            else {
-                forEach(this.target, function (e) {
-                    if (e.style.display !== 'none') {
-                        e.style.display = 'none';
-                    }
-                });
-            }
+            });
+            _hide(this.target);
         },
 
         html: function (htmlStr) {
@@ -377,25 +360,15 @@
 
         remove: function () {
             // Remove without filtering
-            if (this.length === 0) {
-                this.target.parentNode.removeChild(this.target);
-            }
-            else {
-                forEach(this.target, function (e) {
-                    e.parentNode.removeChild(e);
-                });
-            }
+            var _remove = decorator(function (e) {
+                e.parentNode.removeChild(e);
+            });
+            _remove(this.target);
         },
 
         removeClass: function (className) {
-            if (this.length === 0) {
-                classy.remove(this.target, className);
-            }
-            else {
-                forEach(this.target, function (e) {
-                    classy.remove(e, className);
-                });
-            }
+            var _removeClass = decorator(classy.remove);
+            _removeClass(this.target, className);
             
             return this;
         },
