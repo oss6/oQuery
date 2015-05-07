@@ -47,8 +47,19 @@
                         'Append to parent');
             });
 
-            $t.suite('attr', function () {
+            $t.suite('append', function () {
+                var dummy = document.createElement('div');
 
+                // String
+                $o(dummy).append('<h1>I am an H1</h1>');
+                $t.assert(dummy.lastChild.tagName === 'H1', 'Append string element');
+            });
+
+            $t.suite('attr', function () {
+                var dummy = document.createElement('div');
+                $o(dummy).attr('id', 'dummy');
+
+                $t.assert($o(dummy).attr('id') === 'dummy', 'Set and get attribute');
             });
 
             $t.suite('bind', function () {
@@ -56,7 +67,10 @@
             });
 
             $t.suite('css', function () {
+                var dummy = document.createElement('div');
+                $o(dummy).css('color', '#f00');
 
+                $t.assert($o(dummy).css('color') === '#f00' && dummy.style.color === 'rgb(255, 0, 0)', 'Apply color');
             });
 
             $t.suite('eq', function () {

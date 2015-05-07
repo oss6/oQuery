@@ -144,8 +144,6 @@
         };
 
         exp.add = function (el, name) {
-            console.log(el);
-
             if (exp.has(el, name)) return;
 
             if (el.className === '') {
@@ -292,10 +290,10 @@
             else {
                 if (this.length) {
                     for (var i = 0, len = this.length; i < len; i++) {
-                        this.target[i][prop] = value;
+                        this.target[i].style[prop] = value;
                     }
                 } else {
-                    this.target[prop] = value;
+                    this.target.style[prop] = value;
                 }
                 
                 return this;
